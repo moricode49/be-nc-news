@@ -6,6 +6,23 @@ function fetchTopics() {
 	});
 }
 
+function fetchArticles() {
+	return db
+		.query(
+			"SELECT articles.article_id, COUNT(comments.article_id) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id"
+		)
+		.then((response) => {
+			console.log(response.rows);
+		});
+	// return db
+	// 	.query(
+	// 		"SELECT author, title, article_id, topic, created_at, votes, article_img_url FROM articles ORDER BY created_at DESC"
+	// 	)
+	// 	.then((response) => {
+	// 		return response.rows;
+	// 	});
+}
+
 function fetchArticleById(articleId) {
 	return db
 		.query("SELECT * FROM articles WHERE article_id = $1", [articleId])
@@ -17,4 +34,4 @@ function fetchArticleById(articleId) {
 		});
 }
 
-module.exports = { fetchTopics, fetchArticleById };
+module.exports = { fetchTopics, fetchArticles, fetchArticleById };

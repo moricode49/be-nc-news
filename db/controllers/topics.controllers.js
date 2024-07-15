@@ -1,8 +1,18 @@
-const { fetchTopics, fetchArticleById } = require("../models/topics.models");
+const {
+	fetchTopics,
+	fetchArticleById,
+	fetchArticles,
+} = require("../models/topics.models");
 
 function getTopics(request, response, next) {
 	return fetchTopics().then((topics) => {
 		response.status(200).send(topics);
+	});
+}
+
+function getArticles(request, response, next) {
+	return fetchArticles().then((articles) => {
+		response.status(200).send(articles);
 	});
 }
 
@@ -17,4 +27,4 @@ function getArticleById(request, response, next) {
 		});
 }
 
-module.exports = { getTopics, getArticleById };
+module.exports = { getTopics, getArticles, getArticleById };
