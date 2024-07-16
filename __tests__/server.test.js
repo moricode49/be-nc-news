@@ -107,3 +107,49 @@ describe("/api/articles", () => {
 		});
 	});
 });
+
+describe("/api/articles/:article_id/comments", () => {
+	describe("GET", () => {
+		test("GET 200, responds with all comments for a given article", () => {
+			return request(app)
+				.get("/api/articles/3/comments")
+				.expect(200)
+				.then(({ body }) => {
+					expect(body).toEqual([
+						{
+							comment_id: 11,
+							body: "Ambidextrous marsupial",
+							article_id: 3,
+							author: "icellusedkars",
+							votes: 0,
+							created_at: "2020-09-19T23:10:00.000Z",
+						},
+						{
+							comment_id: 10,
+							body: "git push origin master",
+							article_id: 3,
+							author: "icellusedkars",
+							votes: 0,
+							created_at: "2020-06-20T07:24:00.000Z",
+						},
+					]);
+				});
+		});
+		test("GET 400, responds with a 400 error when requested with wrong data type", () => {
+			return request(app)
+				.get("/api/articles/not_a_number/comments")
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("GET 404, responds with a 404 error when requested with an id that doesn't exist", () => {
+			return request(app)
+				.get("/api/articles/9000/comments")
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("article does not exist");
+				});
+		});
+	});
+});

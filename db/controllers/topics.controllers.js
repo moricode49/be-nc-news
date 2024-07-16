@@ -2,6 +2,7 @@ const {
 	fetchTopics,
 	fetchArticleById,
 	fetchArticles,
+	fetchCommentsByArticleId,
 } = require("../models/topics.models");
 
 function getTopics(request, response, next) {
@@ -27,4 +28,20 @@ function getArticleById(request, response, next) {
 		});
 }
 
-module.exports = { getTopics, getArticles, getArticleById };
+function getCommentsByArticleId(request, response, next) {
+	const articleId = request.params.article_id;
+	return fetchCommentsByArticleId(articleId)
+		.then((comments) => {
+			response.status(200).send(comments);
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
+module.exports = {
+	getTopics,
+	getArticles,
+	getArticleById,
+	getCommentsByArticleId,
+};
