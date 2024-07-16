@@ -5,8 +5,11 @@ const {
 	getArticleById,
 	getArticles,
 	getCommentsByArticleId,
+	postNewComment,
 } = require("./controllers/topics.controllers");
 const endpoints = require("../endpoints.json");
+
+app.use(express.json());
 
 app.get("/api", (request, response) => {
 	response.status(200).send({ endpoints });
@@ -20,9 +23,15 @@ app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
+app.post("/api/articles/:article_id/comments", postNewComment);
+
 //400 (SQL) errors
 app.use((error, request, response, next) => {
-	if (error.code === "22P02") {
+	if (
+		error.code === "22P02" ||
+		error.code === "23502" ||
+		error.code === "23503"
+	) {
 		response.status(400).send({ msg: "Bad request" });
 	}
 	next(error);
@@ -37,7 +46,7 @@ app.use((error, request, response, next) => {
 });
 
 //500 error
-app.use((error, request, response, next) => {
+app.use((error, request, response) => {
 	response.status(500).send({ msg: "Internal Server Error" });
 });
 

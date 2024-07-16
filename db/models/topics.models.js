@@ -1,4 +1,5 @@
 const db = require("../connection");
+const format = require("pg-format");
 
 function fetchTopics() {
 	return db.query("SELECT * FROM topics").then((response) => {
@@ -41,9 +42,26 @@ function fetchCommentsByArticleId(articleId) {
 		});
 }
 
+function newComment(articleId, commentBody) {
+	const newCommentValuesArray = [
+		commentBody.body,
+		articleId,
+		commentBody.username,
+	];
+
+	const formattedComments = format(
+		"INSERT INTO comments(body, article_id, author) VALUES %L RETURNING *",
+		[newCommentValuesArray]
+	);
+	return db.query(formattedComments).then((response) => {
+		return response.rows[0];
+	});
+}
+
 module.exports = {
 	fetchTopics,
 	fetchArticles,
 	fetchArticleById,
 	fetchCommentsByArticleId,
+	newComment,
 };
