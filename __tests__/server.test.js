@@ -65,20 +65,15 @@ describe("/api/articles", () => {
 					});
 				});
 		});
-		test.only("Each article object has a comment_count property with the total count of all the comments with this article_id", () => {
+		test("An article object has a comment_count property with the total count of all the comments related to each article", () => {
 			return request(app)
 				.get("/api/articles")
 				.expect(200)
 				.then(({ body }) => {
-					body.forEach((article) => {
-						expect(article).toMatchObject({
-							comment_count: expect.any(Number),
-						});
-					});
+					expect(body[0]).toHaveProperty("comment_count", "2");
 				});
 		});
-	});
-	describe("GET, responds with article by Id", () => {
+		describe("GET, responds with article by Id", () => {});
 		test("GET 200, responds with an article when requested with article_id", () => {
 			return request(app)
 				.get("/api/articles/1")
