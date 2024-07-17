@@ -6,6 +6,7 @@ const {
 	getArticles,
 	getCommentsByArticleId,
 	postNewComment,
+	updateArticleById,
 } = require("./controllers/topics.controllers");
 const endpoints = require("../endpoints.json");
 
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postNewComment);
+
+app.patch("/api/articles/:article_id", updateArticleById);
 
 //400 (SQL) errors
 app.use((error, request, response, next) => {

@@ -108,6 +108,81 @@ describe("/api/articles", () => {
 	});
 });
 
+describe("/api/articles/:article_id", () => {
+	describe("PATCH", () => {
+		test("PATCH 200, increases the votes value on an article when given an article_id and returns the updated article", () => {
+			const body = { inc_votes: 1 };
+			return request(app)
+				.patch("/api/articles/3")
+				.send(body)
+				.expect(200)
+				.then(({ body }) => {
+					expect(body).toEqual({
+						article_id: 3,
+						title: "Eight pug gifs that remind me of mitch",
+						topic: "mitch",
+						author: "icellusedkars",
+						body: "some gifs",
+						created_at: "2020-11-03T09:12:00.000Z",
+						article_img_url:
+							"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+						votes: 1,
+					});
+				});
+		});
+		test("PATCH 200, decreases the votes value on an article if given a negative number when given an article_id and returns the updated article", () => {
+			const body = { inc_votes: -1 };
+			return request(app)
+				.patch("/api/articles/1")
+				.send(body)
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.votes).toBe(99);
+				});
+		});
+		test("PATCH 400, responds with a 400 error if the body doesn't contain correct fields", () => {
+			const body = {};
+			return request(app)
+				.patch("/api/articles/3")
+				.send(body)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("PATCH 400, responds with a 400 error if there is valid body fields but with invalid values", () => {
+			const body = { inc_votes: "not_a_number" };
+			return request(app)
+				.patch("/api/articles/3")
+				.send(body)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("PATCH 400, responds with a 400 error when article_id is the wrong data type", () => {
+			const body = { inc_votes: 1 };
+			return request(app)
+				.patch("/api/articles/not_a_number")
+				.send(body)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("PATCH 404, responds with a 404 error when requested with an article_id that doesn't exist", () => {
+			const body = { inc_votes: 1 };
+			return request(app)
+				.patch("/api/articles/9000")
+				.send(body)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("article does not exist");
+				});
+		});
+	});
+});
+
 describe("/api/articles/:article_id/comments", () => {
 	describe("GET", () => {
 		test("GET 200, responds with all comments for a given article", () => {
