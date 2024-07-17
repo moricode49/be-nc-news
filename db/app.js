@@ -8,6 +8,7 @@ const {
 	postNewComment,
 	updateArticleById,
 	deleteComment,
+	getUsers,
 } = require("./controllers/topics.controllers");
 const endpoints = require("../endpoints.json");
 
@@ -20,6 +21,8 @@ app.get("/api", (request, response) => {
 app.get("/api/topics", getTopics);
 
 app.get("/api/articles", getArticles);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/articles/:article_id", getArticleById);
 

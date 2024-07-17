@@ -17,6 +17,12 @@ function fetchArticles() {
 		});
 }
 
+function fetchUsers() {
+	return db.query("SELECT * FROM users").then((response) => {
+		return response.rows;
+	});
+}
+
 function fetchArticleById(articleId) {
 	return db
 		.query("SELECT * FROM articles WHERE article_id = $1", [articleId])
@@ -92,4 +98,5 @@ module.exports = {
 	newComment,
 	updateArticle,
 	removeComment,
+	fetchUsers,
 };

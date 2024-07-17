@@ -6,17 +6,24 @@ const {
 	newComment,
 	updateArticle,
 	removeComment,
+	fetchUsers,
 } = require("../models/topics.models");
 
-function getTopics(request, response, next) {
+function getTopics(request, response) {
 	return fetchTopics().then((topics) => {
-		response.status(200).send(topics);
+		response.status(200).send({ topics });
 	});
 }
 
-function getArticles(request, response, next) {
+function getArticles(request, response) {
 	return fetchArticles().then((articles) => {
-		response.status(200).send(articles);
+		response.status(200).send({ articles });
+	});
+}
+
+function getUsers(request, response) {
+	return fetchUsers().then((users) => {
+		response.status(200).send({ users });
 	});
 }
 
@@ -85,4 +92,5 @@ module.exports = {
 	postNewComment,
 	updateArticleById,
 	deleteComment,
+	getUsers,
 };
