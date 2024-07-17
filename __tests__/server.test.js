@@ -160,7 +160,6 @@ describe("/api/articles/:article_id/comments", () => {
 				.send(body)
 				.expect(201)
 				.then(({ body }) => {
-					console.log(body);
 					expect(body).toEqual({
 						comment_id: expect.any(Number),
 						body: "new comment",
@@ -181,14 +180,14 @@ describe("/api/articles/:article_id/comments", () => {
 					expect(body.msg).toBe("Bad request");
 				});
 		});
-		test("POST 400, responds with a 400 error if the username value is invalid", () => {
+		test("POST 404, responds with a 404 error if the username value is invalid", () => {
 			const body = { username: "invalid_username", body: "new comment" };
 			return request(app)
 				.post("/api/articles/3/comments")
 				.send(body)
-				.expect(400)
+				.expect(404)
 				.then(({ body }) => {
-					expect(body.msg).toBe("Bad request");
+					expect(body.msg).toBe("not found");
 				});
 		});
 		test("POST 400, responds with a 400 error when article_id is the wrong data type", () => {
@@ -208,7 +207,7 @@ describe("/api/articles/:article_id/comments", () => {
 				.send(body)
 				.expect(404)
 				.then(({ body }) => {
-					expect(body.msg).toBe("article does not exist");
+					expect(body.msg).toBe("not found");
 				});
 		});
 	});

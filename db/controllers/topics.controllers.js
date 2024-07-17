@@ -48,6 +48,9 @@ function postNewComment(request, response, next) {
 			response.status(201).send(comment);
 		})
 		.catch((error) => {
+			if (error.code === "23503") {
+				response.status(404).send({ msg: "not found" });
+			}
 			next(error);
 		});
 }

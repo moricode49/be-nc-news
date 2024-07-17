@@ -27,11 +27,7 @@ app.post("/api/articles/:article_id/comments", postNewComment);
 
 //400 (SQL) errors
 app.use((error, request, response, next) => {
-	if (
-		error.code === "22P02" ||
-		error.code === "23502" ||
-		error.code === "23503"
-	) {
+	if (error.code === "22P02" || error.code === "23502") {
 		response.status(400).send({ msg: "Bad request" });
 	}
 	next(error);
