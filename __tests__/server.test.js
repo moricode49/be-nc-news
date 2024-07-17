@@ -287,3 +287,29 @@ describe("/api/articles/:article_id/comments", () => {
 		});
 	});
 });
+
+describe("/api/comments/:comment_id", () => {
+	describe("DELETE", () => {
+		test("DELETE 204, responds with a status of 204 and no content when a comment is deleted", () => {
+			return request(app).delete("/api/comments/4").expect(204);
+		});
+		test("DELETE 400, responds with a 400 error when requested with wrong data type", () => {
+			() => {
+				return request(app)
+					.delete("/api/comments/not_a_number")
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).toBe("Bad request");
+					});
+			};
+		});
+		test("DELETE 404, responds with a 404 error when requested with an id that doesn't exist", () => {
+			return request(app)
+				.delete("/api/comments/9000")
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("comment does not exist");
+				});
+		});
+	});
+});
