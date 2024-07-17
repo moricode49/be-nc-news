@@ -152,4 +152,63 @@ describe("/api/articles/:article_id/comments", () => {
 				});
 		});
 	});
+	describe("POST", () => {
+		test("POST 200, responds with newly posted comment", () => {
+			const body = { username: "butter_bridge", body: "new comment" };
+			return request(app)
+				.post("/api/articles/3/comments")
+				.send(body)
+				.expect(201)
+				.then(({ body }) => {
+					expect(body).toEqual({
+						comment_id: expect.any(Number),
+						body: "new comment",
+						article_id: 3,
+						author: "butter_bridge",
+						votes: 0,
+						created_at: expect.any(String),
+					});
+				});
+		});
+		test("POST 400, responds with a 400 error if the body doesn't contain correct fields", () => {
+			const body = {};
+			return request(app)
+				.post("/api/articles/3/comments")
+				.send(body)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("POST 404, responds with a 404 error if the username value is invalid", () => {
+			const body = { username: "invalid_username", body: "new comment" };
+			return request(app)
+				.post("/api/articles/3/comments")
+				.send(body)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("not found");
+				});
+		});
+		test("POST 400, responds with a 400 error when article_id is the wrong data type", () => {
+			const body = { username: "butter_bridge", body: "new comment" };
+			return request(app)
+				.post("/api/articles/not_a_number/comments")
+				.send(body)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
+		});
+		test("POST 404, responds with a 404 error when requested with an article_id that doesn't exist", () => {
+			const body = { username: "butter_bridge", body: "new comment" };
+			return request(app)
+				.post("/api/articles/9000/comments")
+				.send(body)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("not found");
+				});
+		});
+	});
 });
