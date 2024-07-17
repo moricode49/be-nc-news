@@ -75,7 +75,46 @@ describe("/api/articles", () => {
 					expect(body.articles[0]).toHaveProperty("comment_count", "2");
 				});
 		});
-		describe("GET, responds with article by Id", () => {});
+		describe("Queries", () => {
+			test("?sort_by= responds with all the articles sorted by the requested query", () => {
+				return request(app)
+					.get("/api/articles?sort_by=author")
+					.expect(200)
+					.then(({ body }) => {
+						expect(body.articles).toHaveLength(13);
+						expect(body.articles).toBeSortedBy("author", { descending: true });
+					});
+			});
+			test("GET 404 responds with a 404 error when sort by query is invalid", () => {
+				return request(app)
+					.get("/api/articles?sort_by=not_a_column")
+					.expect(400)
+					.then(({ body }) => {
+						expect(body).toEqual({ msg: "Bad request" });
+					});
+			});
+			test("?sort_by= responds with all the articles ordered by order query", () => {
+				return request(app)
+					.get("/api/articles?order=asc")
+					.expect(200)
+					.then(({ body }) => {
+						expect(body.articles).toHaveLength(13);
+						expect(body.articles).toBeSortedBy("created_at", {
+							ascending: true,
+						});
+					});
+			});
+			test("GET 400 responds with a 400 error when order query is invalid", () => {
+				return request(app)
+					.get("/api/articles?order=not_a_valid_order")
+					.expect(400)
+					.then(({ body }) => {
+						expect(body).toEqual({ msg: "Bad request" });
+					});
+			});
+		});
+	});
+	describe("GET, responds with article by Id", () => {
 		test("GET 200, responds with an article when requested with article_id", () => {
 			return request(app)
 				.get("/api/articles/1")
@@ -315,14 +354,12 @@ describe("/api/comments/:comment_id", () => {
 			return request(app).delete("/api/comments/4").expect(204);
 		});
 		test("DELETE 400, responds with a 400 error when requested with wrong data type", () => {
-			() => {
-				return request(app)
-					.delete("/api/comments/not_a_number")
-					.expect(400)
-					.then(({ body }) => {
-						expect(body.msg).toBe("Bad request");
-					});
-			};
+			return request(app)
+				.delete("/api/comments/not_a_number")
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe("Bad request");
+				});
 		});
 		test("DELETE 404, responds with a 404 error when requested with an id that doesn't exist", () => {
 			return request(app)

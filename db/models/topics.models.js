@@ -7,14 +7,24 @@ function fetchTopics() {
 	});
 }
 
-function fetchArticles() {
-	return db
-		.query(
-			"SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id  ORDER BY created_at DESC"
-		)
-		.then((response) => {
-			return response.rows;
-		});
+function fetchArticles(sortBy = "created_at", order) {
+	const greenList = ["title", "topic", "author", "created_at"];
+	if (!greenList.includes(sortBy)) {
+		return Promise.reject({ status: 400, msg: "Bad request" });
+	}
+	let sqlString = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sortBy} `;
+
+	if (order === "asc") {
+		sqlString += `ASC`;
+	} else if (order === "desc" || !order) {
+		sqlString += `DESC`;
+	} else {
+		return Promise.reject({ status: 400, msg: "Bad request" });
+	}
+
+	return db.query(sqlString).then((response) => {
+		return response.rows;
+	});
 }
 
 function fetchUsers() {
