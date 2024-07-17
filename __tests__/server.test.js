@@ -26,7 +26,7 @@ describe("/api/topics", () => {
 				.get("/api/topics")
 				.expect(200)
 				.then(({ body }) => {
-					expect(body).toEqual([
+					expect(body.topics).toEqual([
 						{
 							description: "The man, the Mitch, the legend",
 							slug: "mitch",
@@ -52,7 +52,9 @@ describe("/api/articles", () => {
 				.get("/api/articles")
 				.expect(200)
 				.then(({ body }) => {
-					expect(body).toBeSortedBy("created_at", { descending: true });
+					expect(body.articles).toBeSortedBy("created_at", {
+						descending: true,
+					});
 				});
 		});
 		test("object response doesn't contain a body property", () => {
@@ -60,7 +62,7 @@ describe("/api/articles", () => {
 				.get("/api/articles")
 				.expect(200)
 				.then(({ body }) => {
-					body.forEach((article) => {
+					body.articles.forEach((article) => {
 						expect(article).not.toHaveProperty("body");
 					});
 				});
@@ -70,7 +72,7 @@ describe("/api/articles", () => {
 				.get("/api/articles")
 				.expect(200)
 				.then(({ body }) => {
-					expect(body[0]).toHaveProperty("comment_count", "2");
+					expect(body.articles[0]).toHaveProperty("comment_count", "2");
 				});
 		});
 		describe("GET, responds with article by Id", () => {});
@@ -103,6 +105,25 @@ describe("/api/articles", () => {
 				.expect(404)
 				.then(({ body }) => {
 					expect(body.msg).toBe("article does not exist");
+				});
+		});
+	});
+});
+
+describe("/api/users", () => {
+	describe("GET", () => {
+		test("GET 200, responds with an array of all users", () => {
+			return request(app)
+				.get("/api/users")
+				.expect(200)
+				.then(({ body }) => {
+					body.users.forEach((user) => {
+						expect(user).toMatchObject({
+							username: expect.any(String),
+							name: expect.any(String),
+							avatar_url: expect.any(String),
+						});
+					});
 				});
 		});
 	});
