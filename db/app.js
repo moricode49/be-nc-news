@@ -35,6 +35,13 @@ app.use((error, request, response, next) => {
 
 //custom 404 errors
 app.use((error, request, response, next) => {
+	if (error.code === "23503") {
+		response.status(404).send({ msg: "not found" });
+	}
+	next(error);
+});
+
+app.use((error, request, response, next) => {
 	if (error.status && error.msg) {
 		response.status(error.status).send({ msg: error.msg });
 	}
