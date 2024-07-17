@@ -58,10 +58,25 @@ function newComment(articleId, commentBody) {
 	});
 }
 
+function updateArticle(article_id, votes) {
+	return db
+		.query(
+			"UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING *",
+			[article_id, votes]
+		)
+		.then((response) => {
+			if (response.rows.length === 0) {
+				return Promise.reject({ status: 404, msg: "article does not exist" });
+			}
+			return response.rows[0];
+		});
+}
+
 module.exports = {
 	fetchTopics,
 	fetchArticles,
 	fetchArticleById,
 	fetchCommentsByArticleId,
 	newComment,
+	updateArticle,
 };
