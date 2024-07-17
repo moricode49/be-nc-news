@@ -15,10 +15,15 @@ function getTopics(request, response) {
 	});
 }
 
-function getArticles(request, response) {
-	return fetchArticles().then((articles) => {
-		response.status(200).send({ articles });
-	});
+function getArticles(request, response, next) {
+	const { sort_by, order } = request.query;
+	return fetchArticles(sort_by, order)
+		.then((articles) => {
+			response.status(200).send({ articles });
+		})
+		.catch((error) => {
+			next(error);
+		});
 }
 
 function getUsers(request, response) {
