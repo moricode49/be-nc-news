@@ -7,13 +7,27 @@ function fetchTopics() {
 	});
 }
 
-function fetchArticles(sortBy = "created_at", order) {
+function fetchArticles(sortBy = "created_at", order, topic) {
+	let queryValues = [];
 	const greenList = ["title", "topic", "author", "created_at"];
 	if (!greenList.includes(sortBy)) {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
-	let sqlString = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sortBy} `;
+	const allowedTopics = ["mitch", "cats", "paper", undefined];
+	if (!allowedTopics.includes(topic)) {
+		return Promise.reject({ status: 400, msg: "Bad request" });
+	}
 
+	let sqlString = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id  `;
+
+	if (topic !== undefined) {
+		queryValues.push(topic);
+		sqlString += `WHERE topic = $1 `;
+	}
+
+	sqlString += `GROUP BY articles.article_id`;
+
+	sqlString += ` ORDER BY ${sortBy} `;
 	if (order === "asc") {
 		sqlString += `ASC`;
 	} else if (order === "desc" || !order) {
@@ -22,7 +36,7 @@ function fetchArticles(sortBy = "created_at", order) {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
 
-	return db.query(sqlString).then((response) => {
+	return db.query(sqlString, queryValues).then((response) => {
 		return response.rows;
 	});
 }
