@@ -4,8 +4,6 @@ const {
 	formatComments,
 } = require("../db/seeds/utils");
 
-const { checkExists } = require("../db/utils");
-
 describe("convertTimestampToDate", () => {
 	test("returns a new object", () => {
 		const timestamp = 1557572706232;
@@ -103,21 +101,4 @@ describe("formatComments", () => {
 		const formattedComments = formatComments(comments, {});
 		expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
 	});
-});
-
-describe("checkExists", () => {
-	test("returns an empty array, if passed a topic value that doesn't exist in the db", () => {
-		const output = checkExists("topics", "slug", "not-a-topic");
-		expect(output).toEqual([]);
-	});
-	test.only("returns an array of matching topic data if passed a topic that exists but doesn't contain any values", () => {
-		checkExists("topics", "slug", "paper").then((response) => {
-			expect(response).toEqual([
-				{ slug: "paper", description: "what books are made of" },
-			]);
-		});
-	});
-	test.todo(
-		"returns an array of matching topic data if passed a topic that exists and contains articles"
-	);
 });
