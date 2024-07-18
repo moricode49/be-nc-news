@@ -76,41 +76,84 @@ describe("/api/articles", () => {
 				});
 		});
 		describe("Queries", () => {
-			test("?sort_by= responds with all the articles sorted by the requested query", () => {
-				return request(app)
-					.get("/api/articles?sort_by=author")
-					.expect(200)
-					.then(({ body }) => {
-						expect(body.articles).toHaveLength(13);
-						expect(body.articles).toBeSortedBy("author", { descending: true });
-					});
-			});
-			test("GET 404 responds with a 404 error when sort by query is invalid", () => {
-				return request(app)
-					.get("/api/articles?sort_by=not_a_column")
-					.expect(400)
-					.then(({ body }) => {
-						expect(body).toEqual({ msg: "Bad request" });
-					});
-			});
-			test("?sort_by= responds with all the articles ordered by order query", () => {
-				return request(app)
-					.get("/api/articles?order=asc")
-					.expect(200)
-					.then(({ body }) => {
-						expect(body.articles).toHaveLength(13);
-						expect(body.articles).toBeSortedBy("created_at", {
-							ascending: true,
+			describe("sort_by query", () => {
+				test("?sort_by= responds with all the articles sorted by the requested query", () => {
+					return request(app)
+						.get("/api/articles?sort_by=author")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toHaveLength(13);
+							expect(body.articles).toBeSortedBy("author", {
+								descending: true,
+							});
 						});
-					});
+				});
+				test("GET 404 responds with a 404 error when sort by query is invalid", () => {
+					return request(app)
+						.get("/api/articles?sort_by=not_a_column")
+						.expect(400)
+						.then(({ body }) => {
+							expect(body).toEqual({ msg: "Bad request" });
+						});
+				});
 			});
-			test("GET 400 responds with a 400 error when order query is invalid", () => {
-				return request(app)
-					.get("/api/articles?order=not_a_valid_order")
-					.expect(400)
-					.then(({ body }) => {
-						expect(body).toEqual({ msg: "Bad request" });
-					});
+			describe("order by query", () => {
+				test("?sort_by= responds with all the articles ordered by order query", () => {
+					return request(app)
+						.get("/api/articles?order=asc")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toHaveLength(13);
+							expect(body.articles).toBeSortedBy("created_at", {
+								ascending: true,
+							});
+						});
+				});
+				test("GET 400 responds with a 400 error when order query is invalid", () => {
+					return request(app)
+						.get("/api/articles?order=not_a_valid_order")
+						.expect(400)
+						.then(({ body }) => {
+							expect(body).toEqual({ msg: "Bad request" });
+						});
+				});
+			});
+			describe("topic query", () => {
+				test("?topic= responds with articles filtered by requested topic query", () => {
+					return request(app)
+						.get("/api/articles?topic=cats")
+						.expect(200)
+						.then(({ body }) => {
+							body.articles.forEach((article) => {
+								expect(body.articles).toHaveLength(1);
+								expect(article).toMatchObject({ topic: "cats" });
+							});
+						});
+				});
+				test("?topic= responds with all articles if topic query is omitted", () => {
+					return request(app)
+						.get("/api/articles")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toHaveLength(13);
+						});
+				});
+				test("GET 404 responds with a 404 error if the queried topic isn't in the database", () => {
+					return request(app)
+						.get("/api/articles?topic=not-a-topic")
+						.expect(404)
+						.then(({ body }) => {
+							expect(body.msg).toBe("Topic not found");
+						});
+				});
+				test("GET 200 responds with an empty array if the queried topic exists in the database but there are currently no articles associated with it", () => {
+					return request(app)
+						.get("/api/articles?topic=paper")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toEqual([]);
+						});
+				});
 			});
 		});
 	});
