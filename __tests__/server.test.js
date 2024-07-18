@@ -181,7 +181,7 @@ describe("/api/articles", () => {
 					expect(body).toHaveProperty("comment_count");
 				});
 		});
-		test.only("GET 400, responds with a 400 error when requested with wrong data type", () => {
+		test("GET 400, responds with a 400 error when requested with wrong data type", () => {
 			return request(app)
 				.get("/api/articles/not_a_number")
 				.expect(400)
@@ -189,7 +189,7 @@ describe("/api/articles", () => {
 					expect(body.msg).toBe("Bad request");
 				});
 		});
-		test.only("GET 404, responds with a 404 error when requested with an id that doesn't exist", () => {
+		test("GET 404, responds with a 404 error when requested with an id that doesn't exist", () => {
 			return request(app)
 				.get("/api/articles/9000")
 				.expect(404)
