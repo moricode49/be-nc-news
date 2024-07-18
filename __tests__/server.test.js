@@ -173,6 +173,14 @@ describe("/api/articles", () => {
 					expect(body).toHaveProperty("article_img_url");
 				});
 		});
+		test("GET 200, responds with an article containing a comment count when requested with article_id", () => {
+			return request(app)
+				.get("/api/articles/1")
+				.expect(200)
+				.then(({ body }) => {
+					expect(body).toHaveProperty("comment_count");
+				});
+		});
 		test("GET 400, responds with a 400 error when requested with wrong data type", () => {
 			return request(app)
 				.get("/api/articles/not_a_number")
