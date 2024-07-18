@@ -1,5 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
+const { checkExists } = require("../utils");
 
 function fetchTopics() {
 	return db.query("SELECT * FROM topics").then((response) => {
@@ -7,14 +8,21 @@ function fetchTopics() {
 	});
 }
 
+selectTopics = async (topic) => {
+	if (topic) {
+		const output = await checkExists("topics", "slug", topic);
+		if (output.length === 0) {
+			return Promise.reject({ status: 404, msg: "Topic not found" });
+		} else {
+			return output;
+		}
+	}
+};
+
 function fetchArticles(sortBy = "created_at", order, topic) {
 	let queryValues = [];
 	const greenList = ["title", "topic", "author", "created_at"];
 	if (!greenList.includes(sortBy)) {
-		return Promise.reject({ status: 400, msg: "Bad request" });
-	}
-	const allowedTopics = ["mitch", "cats", "paper", undefined];
-	if (!allowedTopics.includes(topic)) {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
 
@@ -123,4 +131,5 @@ module.exports = {
 	updateArticle,
 	removeComment,
 	fetchUsers,
+	selectTopics,
 };

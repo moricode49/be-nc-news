@@ -10,7 +10,7 @@
 		}
 	},
 	"GET /api/articles": {
-		"description": "serves an array of all articles sorted by valid column names if queried, ordered by descending by default or ascending if queried",
+		"description": "serves an array of all articles sorted by valid column names or by topic if queried, ordered by descending by default or ascending if queried",
 		"queries": ["author", "topic", "sort_by", "order"],
 		"exampleResponse": {
 			"articles": [

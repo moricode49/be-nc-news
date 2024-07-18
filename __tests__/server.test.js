@@ -138,22 +138,22 @@ describe("/api/articles", () => {
 							expect(body.articles).toHaveLength(13);
 						});
 				});
-				test("GET 400 responds with a 400 error if the queried topic isn't in the database", () => {
+				test("GET 404 responds with a 404 error if the queried topic isn't in the database", () => {
 					return request(app)
-						.get("/api/articles?topic=dogs")
-						.expect(400)
+						.get("/api/articles?topic=not-a-topic")
+						.expect(404)
 						.then(({ body }) => {
-							expect(body.msg).toBe("Bad request");
+							expect(body.msg).toBe("Topic not found");
 						});
 				});
-				// test.only("GET 400 responds with a 400 error if the queried topic exists in the database but there are currently no articles associated with it", () => {
-				// 	return request(app)
-				// 		.get("/api/articles?topic=paper")
-				// 		.expect(400)
-				// 		.then(({ body }) => {
-				// 			expect(body.msg).toBe("Bad request");
-				// 		});
-				// });
+				test("GET 200 responds with an empty array if the queried topic exists in the database but there are currently no articles associated with it", () => {
+					return request(app)
+						.get("/api/articles?topic=paper")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toEqual([]);
+						});
+				});
 			});
 		});
 	});

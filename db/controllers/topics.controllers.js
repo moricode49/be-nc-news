@@ -7,6 +7,7 @@ const {
 	updateArticle,
 	removeComment,
 	fetchUsers,
+	selectTopics,
 } = require("../models/topics.models");
 
 function getTopics(request, response) {
@@ -17,13 +18,29 @@ function getTopics(request, response) {
 
 function getArticles(request, response, next) {
 	const { sort_by, order, topic } = request.query;
-	return fetchArticles(sort_by, order, topic)
-		.then((articles) => {
-			response.status(200).send({ articles });
-		})
-		.catch((error) => {
-			next(error);
-		});
+	if (topic) {
+		return selectTopics(topic)
+			.then(() => {
+				return fetchArticles(sort_by, order, topic)
+					.then((articles) => {
+						response.status(200).send({ articles });
+					})
+					.catch((error) => {
+						next(error);
+					});
+			})
+			.catch((error) => {
+				next(error);
+			});
+	} else {
+		return fetchArticles(sort_by, order)
+			.then((articles) => {
+				response.status(200).send({ articles });
+			})
+			.catch((error) => {
+				next(error);
+			});
+	}
 }
 
 function getUsers(request, response) {
