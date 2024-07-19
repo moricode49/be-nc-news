@@ -1,5 +1,4 @@
 const db = require("../connection");
-const format = require("pg-format");
 const { checkExists } = require("../utils");
 
 function fetchTopics() {
@@ -11,10 +10,10 @@ function fetchTopics() {
 selectTopics = async (topic) => {
 	if (topic) {
 		const output = await checkExists("topics", "slug", topic);
-		if (output.length === 0) {
+		if (output === false) {
 			return Promise.reject({ status: 404, msg: "Topic not found" });
 		} else {
-			return output;
+			return true;
 		}
 	}
 };
@@ -84,19 +83,14 @@ function fetchCommentsByArticleId(articleId) {
 }
 
 function newComment(articleId, commentBody) {
-	const newCommentValuesArray = [
-		commentBody.body,
-		articleId,
-		commentBody.username,
-	];
-
-	const formattedComments = format(
-		"INSERT INTO comments(body, article_id, author) VALUES %L RETURNING *",
-		[newCommentValuesArray]
-	);
-	return db.query(formattedComments).then((response) => {
-		return response.rows[0];
-	});
+	return db
+		.query(
+			"INSERT INTO comments(body, article_id, author) VALUES ($1, $2, $3) RETURNING *",
+			[commentBody.body, articleId, commentBody.username]
+		)
+		.then((response) => {
+			return response.rows[0];
+		});
 }
 
 function updateArticle(article_id, votes) {

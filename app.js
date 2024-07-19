@@ -11,8 +11,11 @@ const {
 	getUsers,
 } = require("./db/controllers/topics.controllers");
 const endpoints = require("./endpoints.json");
+// const apiRouter = require("./api/api-router");
 
 app.use(express.json());
+
+// app.use("/api", apiRouter);
 
 app.get("/api", (request, response) => {
 	response.status(200).send({ endpoints });
