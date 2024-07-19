@@ -15,6 +15,11 @@ describe("/api", () => {
 			.expect(200)
 			.then(({ body }) => {
 				expect(body.endpoints).toEqual(endpoints);
+				for (endpoint in endpoints) {
+					expect(body.endpoints[endpoint]).toHaveProperty("description");
+					expect(body.endpoints[endpoint]).toHaveProperty("queries");
+					expect(body.endpoints[endpoint]).toHaveProperty("exampleResponse");
+				}
 			});
 	});
 });
@@ -109,6 +114,17 @@ describe("/api/articles", () => {
 							});
 						});
 				});
+				test("?sort_by= responds with all the articles sorted and ordered correctly when passed both a sort_by query and an order by query", () => {
+					return request(app)
+						.get("/api/articles?sort_by=author&order=asc")
+						.expect(200)
+						.then(({ body }) => {
+							expect(body.articles).toHaveLength(13);
+							expect(body.articles).toBeSortedBy("author", {
+								ascending: true,
+							});
+						});
+				});
 				test("GET 400 responds with a 400 error when order query is invalid", () => {
 					return request(app)
 						.get("/api/articles?order=not_a_valid_order")
@@ -163,14 +179,18 @@ describe("/api/articles", () => {
 				.get("/api/articles/1")
 				.expect(200)
 				.then(({ body }) => {
-					expect(body).toHaveProperty("article_id", 1);
-					expect(body).toHaveProperty("title");
-					expect(body).toHaveProperty("topic");
-					expect(body).toHaveProperty("author");
-					expect(body).toHaveProperty("body");
-					expect(body).toHaveProperty("created_at");
-					expect(body).toHaveProperty("votes");
-					expect(body).toHaveProperty("article_img_url");
+					expect(body).toEqual({
+						article_id: 1,
+						title: "Living in the shadow of a great man",
+						topic: "mitch",
+						author: "butter_bridge",
+						body: "I find this existence challenging",
+						created_at: "2020-07-09T20:11:00.000Z",
+						votes: 100,
+						article_img_url:
+							"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+						comment_count: "11",
+					});
 				});
 		});
 		test("GET 200, responds with an article containing a comment count when requested with article_id", () => {
@@ -321,6 +341,7 @@ describe("/api/articles/:article_id/comments", () => {
 					]);
 				});
 		});
+
 		test("GET 400, responds with a 400 error when requested with wrong data type", () => {
 			return request(app)
 				.get("/api/articles/not_a_number/comments")
