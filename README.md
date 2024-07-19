@@ -3,17 +3,14 @@
 API link
 https://nc-news-lrsx.onrender.com/api/
 
-A News API that uses node-postgres to access a PostgreSQL database and provide the data required by the front end architecture
+A News API, developed using TDD, that uses node-postgres to access a PostgreSQL database and provide the data required by the front end architecture
 
 Instructions:
 
 Clone the repo using:
 HTTPS: https://github.com/moricode49/be-nc-news.git
 
-Install dependencies:
-Dotenv
-Express
-Postgres
+Install dependecies using 'npm install'
 
 Set up the database using 'npm run setup-dbs'
 Seed the local database using 'npm run seed'
