@@ -20,7 +20,14 @@ selectTopics = async (topic) => {
 
 function fetchArticles(sortBy = "created_at", order, topic) {
 	let queryValues = [];
-	const greenList = ["title", "topic", "author", "created_at"];
+	const greenList = [
+		"title",
+		"topic",
+		"author",
+		"created_at",
+		"votes",
+		"comment_count",
+	];
 	if (!greenList.includes(sortBy)) {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
@@ -42,7 +49,6 @@ function fetchArticles(sortBy = "created_at", order, topic) {
 	} else {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
-
 	return db.query(sqlString, queryValues).then((response) => {
 		return response.rows;
 	});
